@@ -116,7 +116,7 @@
   }
 
   main {
-    @apply mx-auto container flex flex-col sm:px-10 px-5 py-10;
+    @apply mx-auto container flex flex-1 flex-col sm:px-10 px-5 py-10;
   }
 
   h1 {
@@ -280,45 +280,18 @@
   }
 
   #create-event {
-    .details {
-      @apply flex w-full flex-col lg:flex-row gap-12 items-start mt-4 max-lg:items-center;
-
-      .input {
-        @apply flex flex-[2] flex-col gap-4 max-lg:w-full;
-
-        h1 {
-          @apply text-center;
-        }
-
-        p {
-          @apply text-light-100 text-lg max-sm:text-sm text-center;
-        }
+    .input {
+      h1 {
+        @apply text-center;
       }
 
-      .booking {
-        @apply flex flex-1 w-full flex-col gap-6 p-4 border-l border-gray-700 max-lg:border-l-0 max-lg:border-t max-lg:pt-8;
-
-        .wallpaper {
-          @apply relative h-[240px] w-full overflow-hidden rounded-lg sm:h-[300px];
-        }
-
-        .wallpaper-image {
-          @apply object-cover blur-md scale-110;
-        }
-
-        .signup-card {
-          @apply bg-dark-100 border-dark-200 card-shadow flex w-full flex-col gap-6 rounded-[10px] border px-5 py-6;
-
-          h2 {
-            @apply font-schibsted-grotesk text-2xl font-bold;
-          }
-
-          p {
-            @apply text-light-100 text-lg max-sm:text-sm;
-          }
-
-        }
+      p {
+        @apply text-light-100 text-lg max-sm:text-sm text-center;
       }
+    }
+
+    .booking {
+      @apply max-lg:border-t max-lg:border-gray-700 max-lg:pt-8 lg:border-l lg:border-gray-700 lg:pl-8;
     }
   }
 }
