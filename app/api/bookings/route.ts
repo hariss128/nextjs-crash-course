@@ -1,12 +1,52 @@
-import connectDB from "@/lib/mongodb";
-import Booking from "@/database/booking.model";
+import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
+import connectDB from '@/lib/mongodb';
+import Booking from '@/database/booking.model';
 
-export async function POST(req: Request) {
-    await connectDB();
+export async function POST(req: NextRequest) {
+    try {
+        await connectDB();
 
-    const body = await req.json();
+        const body = await req.json();
+        const { eventId, email } = body as { eventId?: string; email?: string };
 
-    const booking = await Booking.create(body);
+        if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
+            return NextResponse.json({ message: 'Valid event ID is required' }, { status: 400 });
+        }
 
-    return Response.json(booking);
+        if (!email || typeof email !== 'string' || !email.trim()) {
+            return NextResponse.json({ message: 'Email is required' }, { status: 400 });
+        }
+
+        const booking = await Booking.create({ eventId, email: email.trim() });
+
+        return NextResponse.json(
+            { message: 'Booking created successfully', booking },
+            { status: 201 }
+        );
+    } catch (error) {
+        console.error(error);
+
+        if (error instanceof mongoose.Error.ValidationError) {
+            return NextResponse.json(
+                { message: 'Validation failed', error: error.message },
+                { status: 400 }
+            );
+        }
+
+        if (error instanceof Error && 'code' in error && error.code === 11000) {
+            return NextResponse.json(
+                { message: 'You have already booked this event' },
+                { status: 409 }
+            );
+        }
+
+        return NextResponse.json(
+            {
+                message: 'Booking failed',
+                error: error instanceof Error ? error.message : 'Unknown error',
+            },
+            { status: 500 }
+        );
+    }
 }

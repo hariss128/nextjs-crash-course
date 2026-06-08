@@ -12,7 +12,7 @@ export default function Home() {
 
         <div className="mt-20 space-y-7">
             <h3>Featured Events</h3>
-            <div className="events">
+            <div className="events" id="events">
                 {events.map((event) => (
                     <div key={event.title}>
                         <EventCard {...event} />

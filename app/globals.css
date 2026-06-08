@@ -158,7 +158,7 @@
       @apply flex flex-row items-center gap-2;
 
       p {
-        @apply text-xl font-bold italic max-sm:hidden color-white;
+        @apply text-xl font-bold italic max-sm:hidden text-white;
       }
     }
 
@@ -205,6 +205,14 @@
 
       .content {
         @apply flex flex-[2] flex-col gap-8 max-lg:w-full;
+
+        .wallpaper {
+          @apply relative h-[320px] w-full overflow-hidden rounded-lg sm:h-[400px];
+        }
+
+        .wallpaper-image {
+          @apply object-cover blur-md scale-110;
+        }
 
         .banner {
           @apply max-h-[457px] w-full rounded-lg object-cover;
@@ -267,6 +275,49 @@
 
       button {
         @apply bg-primary hover:bg-primary/90 w-full cursor-pointer items-center justify-center rounded-[6px] px-4 py-2.5 text-lg font-semibold text-black;
+      }
+    }
+  }
+
+  #create-event {
+    .details {
+      @apply flex w-full flex-col lg:flex-row gap-12 items-start mt-4 max-lg:items-center;
+
+      .input {
+        @apply flex flex-[2] flex-col gap-4 max-lg:w-full;
+
+        h1 {
+          @apply text-center;
+        }
+
+        p {
+          @apply text-light-100 text-lg max-sm:text-sm text-center;
+        }
+      }
+
+      .booking {
+        @apply flex flex-1 w-full flex-col gap-6 p-4 border-l border-gray-700 max-lg:border-l-0 max-lg:border-t max-lg:pt-8;
+
+        .wallpaper {
+          @apply relative h-[240px] w-full overflow-hidden rounded-lg sm:h-[300px];
+        }
+
+        .wallpaper-image {
+          @apply object-cover blur-md scale-110;
+        }
+
+        .signup-card {
+          @apply bg-dark-100 border-dark-200 card-shadow flex w-full flex-col gap-6 rounded-[10px] border px-5 py-6;
+
+          h2 {
+            @apply font-schibsted-grotesk text-2xl font-bold;
+          }
+
+          p {
+            @apply text-light-100 text-lg max-sm:text-sm;
+          }
+
+        }
       }
     }
   }
