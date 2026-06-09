@@ -4,6 +4,8 @@ import BookEvent from '@/components/BookEvent';
 import connectDB from '@/lib/mongodb';
 import Event from '@/database/event.model';
 
+export const dynamic = 'force-dynamic';
+
 type PageProps = {
     params: Promise<{ slug: string }>;
 };

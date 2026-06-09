@@ -64,22 +64,27 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
             {message && (
                 <p className={`text-sm ${isError ? 'text-red-400' : 'text-primary'}`}>{message}</p>
             )}
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 {slugInput && (
-                    <div>
-                        <label htmlFor="event-slug">Which event do you want to book?</label>
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="event-slug" className="text-sm text-light-100">
+                            Which event do you want to book?
+                        </label>
                         <input
                             id="event-slug"
                             type="text"
-                            placeholder="e.g. cloud-next-2026"
+                            placeholder="e.g. react-summit-us-2025"
                             value={eventSlug}
                             onChange={(e) => setEventSlug(e.target.value)}
                             required
+                            className="rounded-[6px] bg-dark-200 px-5 py-2.5 text-white outline-none"
                         />
                     </div>
                 )}
-                <div>
-                    <label htmlFor="email">Email Address</label>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="email" className="text-sm text-light-100">
+                        Email Address
+                    </label>
                     <input
                         id="email"
                         type="email"
@@ -87,12 +92,21 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        className="rounded-[6px] bg-dark-200 px-5 py-2.5 text-white outline-none"
                     />
                 </div>
-                <button type="submit" disabled={isLoading}>
+                <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full cursor-pointer rounded-[6px] bg-primary px-4 py-2.5 text-lg font-semibold text-black hover:bg-primary/90 disabled:opacity-70"
+                >
                     {isLoading ? 'Booking...' : 'Book Event'}
                 </button>
-                <button type="button" onClick={handleClear}>
+                <button
+                    type="button"
+                    onClick={handleClear}
+                    className="w-full cursor-pointer rounded-[6px] border border-dark-200 bg-dark-200 px-4 py-2.5 text-lg font-semibold text-light-100 hover:bg-dark-200/80"
+                >
                     Clear
                 </button>
             </form>
