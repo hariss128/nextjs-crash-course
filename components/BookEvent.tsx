@@ -1,6 +1,11 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import {
+    getErrorMessage,
+    useCreateBookingMutation,
+    useLazyGetEventBySlugQuery,
+} from '@/store/eventsApi';
 
 type Props = {
     eventId?: string;
@@ -12,11 +17,12 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
     const [eventSlug, setEventSlug] = useState('');
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [createBooking, { isLoading }] = useCreateBookingMutation();
+    const [fetchEvent] = useLazyGetEventBySlugQuery();
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsSubmitting(true);
         setMessage('');
 
         try {
@@ -24,15 +30,7 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
 
             if (!id && slugInput) {
                 const slug = eventSlug.trim().toLowerCase().replace(/\s+/g, '-');
-                const eventRes = await fetch(`/api/events/${slug}`);
-
-                if (!eventRes.ok) {
-                    setMessage('Event not found. Try the event slug (e.g. cloud-next-2026).');
-                    setIsError(true);
-                    return;
-                }
-
-                const data = await eventRes.json();
+                const data = await fetchEvent(slug).unwrap();
                 id = data.event._id;
             }
 
@@ -42,29 +40,15 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
                 return;
             }
 
-            const res = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ eventId: id, email: email.trim() }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setMessage(data.message ?? 'Booking failed.');
-                setIsError(true);
-                return;
-            }
+            await createBooking({ eventId: id, email: email.trim() }).unwrap();
 
             setMessage('Event has been booked!');
             setIsError(false);
             setEmail('');
             setEventSlug('');
-        } catch {
-            setMessage('Something went wrong. Please try again.');
+        } catch (error) {
+            setMessage(getErrorMessage(error));
             setIsError(true);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -105,8 +89,8 @@ const BookEvent = ({ eventId, slugInput = false }: Props) => {
                         required
                     />
                 </div>
-                <button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Booking...' : 'Book Event'}
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Booking...' : 'Book Event'}
                 </button>
                 <button type="button" onClick={handleClear}>
                     Clear

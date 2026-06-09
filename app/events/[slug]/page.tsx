@@ -6,7 +6,7 @@ import Booking from '@/database/booking.model';
 
 type PageProps = {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ booked?: string }>;
+    searchParams: Promise<{ booked?: string; error?: string }>;
 };
 
 async function bookEvent(eventId: string, slug: string, formData: FormData) {
@@ -40,7 +40,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                 <h1 className="text-gradient">{event.title}</h1>
                 <p>{event.description}</p>
                 <div className="flex-row-gap-2 flex-wrap">
-                    {event.tags.map((tag) => (
+                    {event.tags.map((tag: string) => (
                         <span key={tag} className="pill">
                             {tag}
                         </span>
@@ -93,7 +93,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                     <div className="agenda">
                         <h2>Agenda</h2>
                         <ul>
-                            {event.agenda.map((item) => (
+                            {event.agenda.map((item: string) => (
                                 <li key={item}>{item}</li>
                             ))}
                         </ul>
