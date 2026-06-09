@@ -4,6 +4,8 @@ import connectDB from '@/lib/mongodb';
 import Event from '@/database/event.model';
 import { parseEventFormData } from '@/lib/parse-event-form';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         await connectDB();

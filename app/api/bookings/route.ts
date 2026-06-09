@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/database/booking.model';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
     try {
         await connectDB();

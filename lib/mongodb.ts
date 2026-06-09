@@ -1,51 +1,46 @@
 import mongoose from 'mongoose';
+import { getMongoUri } from '@/lib/env';
 
-// Define the connection cache type
 type MongooseCache = {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
 };
 
-// Extend the global object to include our mongoose cache
 declare global {
     // eslint-disable-next-line no-var
     var mongoose: MongooseCache | undefined;
 }
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-
-// Initialize the cache on the global object to persist across hot reloads in development
 let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
 if (!global.mongoose) {
     global.mongoose = cached;
 }
 
-/**
- * Establishes a connection to MongoDB using Mongoose.
- * Caches the connection to prevent multiple connections during development hot reloads.
- * @returns Promise resolving to the Mongoose instance
- */
 async function connectDB(): Promise<typeof mongoose> {
-    // Reuse open connection (important for Vercel serverless warm starts)
+    const MONGODB_URI = getMongoUri();
+
+    if (!MONGODB_URI) {
+        throw new Error(
+            'MONGODB_URI is not set. Add it in Vercel → Settings → Environment Variables (Production), then Redeploy.'
+        );
+    }
+
     if (mongoose.connection.readyState === 1) {
         return mongoose;
     }
 
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect().catch(() => undefined);
+        cached.conn = null;
+        cached.promise = null;
+    }
+
     if (!cached.promise) {
-        if (!MONGODB_URI) {
-            throw new Error(
-                'Please define the MONGODB_URI environment variable in .env.local or Vercel project settings'
-            );
-        }
-
-        const options = {
+        cached.promise = mongoose.connect(MONGODB_URI, {
             bufferCommands: false,
-        };
-
-        cached.promise = mongoose.connect(MONGODB_URI, options).then((connection) => {
-            return connection;
+            serverSelectionTimeoutMS: 15000,
+            maxPoolSize: 10,
         });
     }
 
