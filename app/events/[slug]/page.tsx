@@ -1,31 +1,15 @@
 import Image from 'next/image';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import BookEvent from '@/components/BookEvent';
 import connectDB from '@/lib/mongodb';
 import Event from '@/database/event.model';
-import Booking from '@/database/booking.model';
 
 type PageProps = {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ booked?: string; error?: string }>;
 };
 
-async function bookEvent(eventId: string, slug: string, formData: FormData) {
-    'use server';
-
-    const email = formData.get('email');
-
-    if (!email || typeof email !== 'string' || !email.trim()) {
-        redirect(`/events/${slug}?error=email`);
-    }
-
-    await connectDB();
-    await Booking.create({ eventId, email: email.trim() });
-    redirect(`/events/${slug}?booked=true`);
-}
-
-export default async function EventPage({ params, searchParams }: PageProps) {
+export default async function EventPage({ params }: PageProps) {
     const { slug } = await params;
-    const { booked, error } = await searchParams;
 
     await connectDB();
     const event = await Event.findOne({ slug: slug.toLowerCase() }).lean();
@@ -109,23 +93,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                     <div className="signup-card">
                         <h2>Book Your Spot</h2>
                         <p>Reserve your seat for {event.title}</p>
-                        <div id="book-event">
-                            {booked && <p className="text-sm text-primary">You are booked! Check your email for confirmation.</p>}
-                            {error && <p className="text-sm text-red-400">Please enter a valid email.</p>}
-                            <form action={bookEvent.bind(null, String(event._id), slug)}>
-                                <div>
-                                    <label htmlFor="email">Email Address</label>
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        required
-                                    />
-                                </div>
-                                <button type="submit">Book Event</button>
-                            </form>
-                        </div>
+                        <BookEvent eventId={String(event._id)} />
                     </div>
                 </div>
             </div>
