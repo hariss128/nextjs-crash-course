@@ -4,6 +4,23 @@ import connectDB from '@/lib/mongodb';
 import Event from '@/database/event.model';
 import { parseEventFormData } from '@/lib/parse-event-form';
 
+export async function GET() {
+    try {
+        await connectDB();
+        const events = await Event.find().sort({ date: 1 }).lean();
+        return NextResponse.json({ events }, { status: 200 });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json(
+            {
+                message: 'Failed to fetch events',
+                error: error instanceof Error ? error.message : 'Unknown error',
+            },
+            { status: 500 }
+        );
+    }
+}
+
 export async function POST(req: NextRequest) {
     try {
         await connectDB();

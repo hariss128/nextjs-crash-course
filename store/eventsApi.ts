@@ -29,6 +29,7 @@ export const eventsApi = createApi({
     endpoints: (builder) => ({
         getEvents: builder.query<EventResponse['event'][], void>({
             query: () => '/events',
+            transformResponse: (response: { events: EventResponse['event'][] }) => response.events,
             providesTags: ['Event'],
         }),
         getEventBySlug: builder.query<EventResponse, string>({
