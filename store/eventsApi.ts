@@ -55,6 +55,10 @@ export const {
 } = eventsApi;
 
 export function getErrorMessage(error: unknown): string {
+    if (error && typeof error === 'object' && 'status' in error && error.status === 409) {
+        return 'You have already booked this event';
+    }
+
     if (
         error &&
         typeof error === 'object' &&

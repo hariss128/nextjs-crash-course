@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Booking from '@/database/booking.model';
+import { isDuplicateKeyError } from '@/lib/booking-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,18 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ message: 'Email is required' }, { status: 400 });
         }
 
-        const booking = await Booking.create({ eventId, email: email.trim() });
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const existingBooking = await Booking.findOne({ eventId, email: normalizedEmail });
+
+        if (existingBooking) {
+            return NextResponse.json(
+                { message: 'You have already booked this event' },
+                { status: 409 }
+            );
+        }
+
+        const booking = await Booking.create({ eventId, email: normalizedEmail });
 
         return NextResponse.json(
             { message: 'Booking created successfully', booking },
@@ -36,7 +48,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        if (error instanceof Error && 'code' in error && error.code === 11000) {
+        if (isDuplicateKeyError(error)) {
             return NextResponse.json(
                 { message: 'You have already booked this event' },
                 { status: 409 }
