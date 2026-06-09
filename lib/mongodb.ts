@@ -28,35 +28,32 @@ if (!global.mongoose) {
  * @returns Promise resolving to the Mongoose instance
  */
 async function connectDB(): Promise<typeof mongoose> {
-    // Return existing connection if available
-    if (cached.conn) {
-        return cached.conn;
+    // Reuse open connection (important for Vercel serverless warm starts)
+    if (mongoose.connection.readyState === 1) {
+        return mongoose;
     }
 
-    // Return existing connection promise if one is in progress
     if (!cached.promise) {
-        // Validate MongoDB URI exists
         if (!MONGODB_URI) {
             throw new Error(
-                'Please define the MONGODB_URI environment variable inside .env.local'
+                'Please define the MONGODB_URI environment variable in .env.local or Vercel project settings'
             );
         }
+
         const options = {
-            bufferCommands: false, // Disable Mongoose buffering
+            bufferCommands: false,
         };
 
-        // Create a new connection promise
-        cached.promise = mongoose.connect(MONGODB_URI!, options).then((mongoose) => {
-            return mongoose;
+        cached.promise = mongoose.connect(MONGODB_URI, options).then((connection) => {
+            return connection;
         });
     }
 
     try {
-        // Wait for the connection to establish
         cached.conn = await cached.promise;
     } catch (error) {
-        // Reset promise on error to allow retry
         cached.promise = null;
+        cached.conn = null;
         throw error;
     }
 
