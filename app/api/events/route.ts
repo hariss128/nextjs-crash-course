@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import Event from '@/database/event.model';
 import { parseEventFormData } from '@/lib/parse-event-form';
+import { isDuplicateKeyError } from '@/lib/booking-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,16 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 { message: 'Validation failed', error: error.message },
                 { status: 400 }
+            );
+        }
+
+        if (isDuplicateKeyError(error)) {
+            return NextResponse.json(
+                {
+                    message:
+                        'An event with this title already exists. Use a different title or check GET /api/events.',
+                },
+                { status: 409 }
             );
         }
 
